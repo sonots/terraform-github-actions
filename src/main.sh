@@ -24,6 +24,12 @@ function parseInputs {
     exit 1
   fi
 
+  if [ "${INPUT_TF_ACTIONS_COMMAND}" != "" ]; then
+    tfCommand=${INPUT_TF_ACTIONS_COMMAND}
+  else
+    tfCommand="terraform"
+  fi
+
   if [ "${INPUT_TF_ACTIONS_SUBCOMMAND}" != "" ]; then
     tfSubcommand=${INPUT_TF_ACTIONS_SUBCOMMAND}
   else
@@ -93,6 +99,30 @@ function installTerraform {
   echo "Successfully unzipped Terraform v${tfVersion}"
 }
 
+function installBerglas {
+  if [[ "${berglasVersion}" == "latest" ]]; then
+    url="https://storage.googleapis.com/berglas/master/linux_amd64/berglas"
+  else
+    url="https://storage.googleapis.com/berglas/${berglasVersion}/linux_amd64/berglas"
+  fi
+
+  echo "Downloading Berglas v${berglasVersion}"
+  curl -s -S -L -o /usr/local/bin/berglas ${url}
+  if [ "${?}" -ne 0 ]; then
+    echo "Failed to download Berglas v${berglasVersion}"
+    exit 1
+  fi
+  echo "Successfully downloaded Berglas v${berglasVersion}"
+
+  echo "chmod Berglas v${berglasVersion}"
+  chmod a+x /usr/local/bin/berglas
+  if [ "${?}" -ne 0 ]; then
+    echo "Failed to chmod Berglas v${berglasVersion}"
+    exit 1
+  fi
+  echo "Successfully chmod Berglas v${berglasVersion}"
+}
+
 function main {
   # Source the other files to gain access to their functions
   scriptDir=$(dirname ${0})
@@ -110,26 +140,32 @@ function main {
   case "${tfSubcommand}" in
     fmt)
       installTerraform
+      installBerglas
       terraformFmt ${*}
       ;;
     init)
       installTerraform
+      installBerglas
       terraformInit ${*}
       ;;
     validate)
       installTerraform
+      installBerglas
       terraformValidate ${*}
       ;;
     plan)
       installTerraform
+      installBerglas
       terraformPlan ${*}
       ;;
     apply)
       installTerraform
+      installBerglas
       terraformApply ${*}
       ;;
     output)
       installTerraform
+      installBerglas
       terraformOutput ${*}
       ;;
     *)
