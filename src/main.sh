@@ -27,7 +27,7 @@ function parseInputs {
   if [ "${INPUT_TF_ACTIONS_COMMAND}" != "" ]; then
     tfCommand=${INPUT_TF_ACTIONS_COMMAND}
   else
-    tfCommand="terraform"
+    tfCommand="berglas exec -- terraform"
   fi
 
   if [ "${INPUT_TF_ACTIONS_SUBCOMMAND}" != "" ]; then
